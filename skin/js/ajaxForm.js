@@ -9,6 +9,7 @@ $('.sub').on('click', function() {
         data: arrRequest,
         success:function(response){
             // var reply = JSON.parse(response);
+
         },
         error:function(response){
         }
