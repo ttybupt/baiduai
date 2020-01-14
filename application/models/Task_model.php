@@ -102,8 +102,8 @@ class Task_Model extends MY_Model {
             return false;
         }
         $arrConds = array('taskId' => $strTaskId);
-        $arrTaskInfo = $this->get(array('*'), $arrConds);
-        $this->delete();
+        $bolRet = $this->delete($arrConds);
+        return $bolRet;
     }
 
     /**

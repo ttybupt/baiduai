@@ -25,7 +25,7 @@ class Main extends CI_Controller {
 
 	function __construct() {
 		parent::__construct();
-		$this->load->model('task_model','tm');
+		$this->load->model('task_model', 'tm');
 	}
 
 	/**
@@ -49,7 +49,7 @@ class Main extends CI_Controller {
 		    $v['detailFile'] = empty($v['detailFile']) ? '' : base_url() . "/download/" . $v['detailFile'];
 		}
 		$return['data'] = $arrTaskInfo;
-		$this->load->view("Main.php", $return);
+		$this->load->view("main.php", $return);
 	}
 
     public function process() {
@@ -78,11 +78,10 @@ class Main extends CI_Controller {
 
     public function upload() {
 	    //TODO:用框架upload相关类
-        $dir = '/Users/tangtianyu/www/baiduai/upload/';
+        $dir = 'upload/';
         $fileName = $_FILES["uploadFile"]["name"];
         $strNewFileName = md5(time()) .".mp3";
         move_uploaded_file($_FILES["uploadFile"]["tmp_name"], $dir . $strNewFileName);
-        $strNewFileName = '1576841208.mp3';
         $url = "http://120.79.24.61/baiduai/upload/$strNewFileName";
 
         $arrRet = $this->createTask($url);
@@ -90,7 +89,7 @@ class Main extends CI_Controller {
         if (empty($arrRet['error_code']) && !empty($arrRet['task_id']) && $arrRet['task_status'] == 'Created') {
             $strTaskId = $arrRet['task_id'];
             //插入
-            $bolRet = $this->tm->addRecord($fileName,$strTaskId);
+            $bolRet = $this->tm->addRecord($strTaskId, $fileName);
             if (!$bolRet) {
                 return false;
             }
@@ -285,5 +284,14 @@ class Main extends CI_Controller {
 
     }
 
-
+    public function del($strTaskId) {
+        if (empty($strTaskId)) {
+            return false;
+        }
+        $bolRet = $this->tm->deleteTaskItemByTaskId($strTaskId);
+        if ($bolRet) {
+            redirect("Main/index", 'refresh');
+        }
+        return $bolRet;
+    }
 }

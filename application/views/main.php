@@ -12,7 +12,7 @@
     <!--	<script src="--><?php //echo base_url()?><!--skin/js/bootstrap-datetimepicker.js" charset="UTF-8"></script>-->
     <!--	<script type="text/javascript" src="--><?php //echo base_url()?><!--skin/js/locales/bootstrap-datetimepicker.zh-CN.js" charset="UTF-8"></script>-->
 	<!-- 引入 echarts.js -->
-	<script src="<?php echo base_url()?>skin/js/echarts.min.js"></script>
+<!--	<script src="--><?php //echo base_url()?><!--skin/js/echarts.min.js"></script>-->
 	<script src="<?php echo base_url()?>skin/js/jquery-1.10.2.js"></script>
     <script src="<?php echo base_url()?>skin/js/bootstrap.min.js"></script>
 	<!-- Latest compiled and minified CSS -->
@@ -70,7 +70,7 @@
                                     <td>
                                         <input style="margin-right:20px" type="button" class="sub btn btn-default" name="query" value="查询" data-taskid="<?php echo  $v['taskId'];?>"/>
 <!--                                        <input style="margin-right:20px" type="button" class="sub btn btn-default" name="mod" value="修改" data-taskid="--><?php //echo  $v['taskId'];?><!--">-->
-                                        <input style="margin-right:20px" type="button" class="sub btn btn-default" name="del" value="删除" data-taskid="<?php echo  $v['taskId'];?>" onclick="{if(confirm('确定删除所选中内容吗?')){return true;}return false;}"/>
+                                        <input style="margin-right:20px" type="button" class="sub btn btn-default" name="del" value="删除" data-taskid="<?php echo  $v['taskId'];?>"/>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
