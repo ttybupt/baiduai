@@ -9,57 +9,57 @@
 
 class Main extends CI_Controller {
 
-    const STATUS_INIT = 0;
-    const STATUS_DEALING = 1;
+    const STATUS_INIT     = 0;
+    const STATUS_DEALING  = 1;
     const STATUS_SUCCUESS = 2;
-    const STATUS_FAIL = 3;
+    const STATUS_FAIL     = 3;
 
-    protected $arrStatus = array(
-        self::STATUS_INIT => '初始化',
-        self::STATUS_DEALING => '转换中',
+    protected $arrStatus = [
+        self::STATUS_INIT     => '初始化',
+        self::STATUS_DEALING  => '转换中',
         self::STATUS_SUCCUESS => '转换成功',
-        self::STATUS_FAIL => '转换失败',
-    );
+        self::STATUS_FAIL     => '转换失败',
+    ];
 
     protected $downloadDir = 'download/';
 
-	function __construct() {
-		parent::__construct();
-		$this->load->model('task_model', 'tm');
-	}
+    function __construct() {
+        parent::__construct();
+        $this->load->model('task_model', 'tm');
+    }
 
-	/**
-	 * 主页页面呈现
-	 * Detail description
-	 * @param
-	 * @since     1.0
-	 * @access    public
-	 * @return    void
-	 * @throws
-	 */
-	public function index(){
-		//构造堆叠图数据
+    /**
+     * 主页页面呈现
+     * Detail description
+     * @param
+     * @return    void
+     * @throws
+     * @since     1.0
+     * @access    public
+     */
+    public function index() {
+        //构造堆叠图数据
         date_default_timezone_set("Asia/Shanghai");
-		$arrTaskInfo = $this->tm->getTaskListInfo();
-		foreach ($arrTaskInfo as $k => &$v) {
-		    $v['createTime'] = date("Y-m-d H:i:s", $v['createTime']);
-		    $v['updateTime'] = empty($v['updateTime']) ? '' : date("Y-m-d H:i:s", $v['updateTime']);
-		    $v['status'] = $this->arrStatus[$v['status']];
-		    $v['contentFile'] = empty($v['contentFile']) ? '' : base_url() . "/download/" . $v['contentFile'];
-		    $v['detailFile'] = empty($v['detailFile']) ? '' : base_url() . "/download/" . $v['detailFile'];
-		}
-		$return['data'] = $arrTaskInfo;
-		$this->load->view("main.php", $return);
-	}
+        $arrTaskInfo = $this->tm->getTaskListInfo();
+        foreach ($arrTaskInfo as $k => &$v) {
+            $v['createTime']  = date("Y-m-d H:i:s", $v['createTime']);
+            $v['updateTime']  = empty($v['updateTime']) ? '' : date("Y-m-d H:i:s", $v['updateTime']);
+            $v['status']      = $this->arrStatus[$v['status']];
+            $v['contentFile'] = empty($v['contentFile']) ? '' : base_url() . "/download/" . $v['contentFile'];
+            $v['detailFile']  = empty($v['detailFile']) ? '' : base_url() . "/download/" . $v['detailFile'];
+        }
+        $return['data'] = $arrTaskInfo;
+        $this->load->view("main.php", $return);
+    }
 
     public function process() {
-        $strMod = $this->input->post('mod');
+        $strMod      = $this->input->post('mod');
         $strTaskName = $this->input->post('taskName');
-        $strTaskId = $this->input->post('taskId');
-        switch($strMod) {
-//            case '修改' :
-//                $bolRet = $this->tm->updateTaskNameByTaskId($strTaskName, $strTaskId);
-//                break;
+        $strTaskId   = $this->input->post('taskId');
+        switch ($strMod) {
+            //            case '修改' :
+            //                $bolRet = $this->tm->updateTaskNameByTaskId($strTaskName, $strTaskId);
+            //                break;
             case 'query' :
                 $bolRet = $this->queryTaskInfo($strTaskId);
                 break;
@@ -74,13 +74,13 @@ class Main extends CI_Controller {
         }
         $arrRet['ret'] = $bolRet;
         return $arrRet;
-	}
+    }
 
     public function upload() {
-	    //TODO:用框架upload相关类
-        $dir = 'upload/';
-        $fileName = $_FILES["uploadFile"]["name"];
-        $strNewFileName = md5(time()) .".mp3";
+        //TODO:用框架upload相关类
+        $dir            = 'upload/';
+        $fileName       = $_FILES["uploadFile"]["name"];
+        $strNewFileName = md5(time()) . ".mp3";
         move_uploaded_file($_FILES["uploadFile"]["tmp_name"], $dir . $strNewFileName);
         $url = "http://120.79.24.61/baiduai/upload/$strNewFileName";
 
@@ -100,101 +100,100 @@ class Main extends CI_Controller {
         }
 
     }
-	
-	
-	public function queryTaskInfo($strTaskId) {
+
+    public function queryTaskInfo($strTaskId) {
         if (empty($strTaskId)) {
             return false;
         }
-        $arrConds  = array('taskId' => $strTaskId);
-        $arrTask = $this->tm->get(array('*'), $arrConds);
-//        if (!empty($arrTask['contentFile']) && !empty($arrTask['detailFile'])) {
-//            return true;
-//        } else {
-            $this->queryTask($strTaskId);
-//        }
+        $arrConds = ['taskId' => $strTaskId];
+        $arrTask  = $this->tm->get(['*'], $arrConds);
+        //        if (!empty($arrTask['contentFile']) && !empty($arrTask['detailFile'])) {
+        //            return true;
+        //        } else {
+        $this->queryTask($strTaskId);
+        //        }
         redirect("Main/index");
-	}
-
+    }
 
     /**
      * @brief   创建语音转文本任务
+     * @param   $mp3Url
      * @author  唐天宇 <tangtianyu@baidu.com>
      * @version 2019-12-16 19:05:32
-     * @param   $mp3Url
      */
     public function createTask($mp3Url) {
-        $url = 'https://aip.baidubce.com/rpc/2.0/aasr/v1/create';
-        $arrPost = array(
+        $url      = 'https://aip.baidubce.com/rpc/2.0/aasr/v1/create';
+        $arrPost  = [
             'speech_url' => $mp3Url,
-            'format' => 'mp3',
-            'pid' => 1537,
-        );
+            'format'     => 'mp3',
+            'pid'        => 1537,
+            'rate'       => 16000,
+        ];
         $strToken = $this->getToken();
-        $url .= '?access_token=' . $strToken;
+        $url      .= '?access_token=' . $strToken;
 
-        $strJson = json_encode($arrPost);
-        $arrHeaders[] = "Content-Length: ".strlen($strJson);
+        $strJson      = json_encode($arrPost);
+        $arrHeaders[] = "Content-Length: " . strlen($strJson);
         $arrHeaders[] = 'Content-Type: application/json; charset=utf-8';
-        $res = $this->request_post($url, $strJson, $arrHeaders);
-        $arrRet = json_decode($res, true);
-        return  $arrRet;
+        $res          = $this->request_post($url, $strJson, $arrHeaders);
+        $arrRet       = json_decode($res, true);
+        return $arrRet;
     }
 
     /**
      * @brief   查询任务状态
+     * @param   string    $strTask
      * @author  唐天宇 <tangtianyu@baidu.com>
      * @version 2019-12-16 19:06:28
-     * @param   string $strTask
      */
     public function queryTask($strTaskId) {
         if (empty($strTaskId)) {
             return false;
         }
 
-        $url = 'https://aip.baidubce.com/rpc/2.0/aasr/v1/query';
-        $arrPost = array(
-            'task_ids' => array($strTaskId),
-        );
+        $url      = 'https://aip.baidubce.com/rpc/2.0/aasr/v1/query';
+        $arrPost  = [
+            'task_ids' => [$strTaskId],
+        ];
         $strToken = $this->getToken();
-        $url .= '?access_token=' . $strToken;
+        $url      .= '?access_token=' . $strToken;
 
-        $strJson = json_encode($arrPost);
-        $arrHeaders[] = "Content-Length: ".strlen($strJson);
+        $strJson      = json_encode($arrPost);
+        $arrHeaders[] = "Content-Length: " . strlen($strJson);
         $arrHeaders[] = 'Content-Type: application/json; charset=utf-8';
-        $res = $this->request_post($url, $strJson, $arrHeaders);
-        $arrRet = json_decode($res, true);
-        $arrTaskInfo = $arrRet['tasks_info'][0];
-        $strStatus = $arrTaskInfo['task_status'];
+        $res          = $this->request_post($url, $strJson, $arrHeaders);
+        $arrRet       = json_decode($res, true);
+        $arrTaskInfo  = $arrRet['tasks_info'][0];
+        $strStatus    = $arrTaskInfo['task_status'];
         if ($strStatus == 'Running') {
-            $this->tm->updateTaskFieldsByTaskId(array('status' => self::STATUS_DEALING, 'updateTime' => time()), $strTaskId);
+            $this->tm->updateTaskFieldsByTaskId(['status' => self::STATUS_DEALING, 'updateTime' => time()], $strTaskId);
         } else if ($strStatus == 'Success') {
-            $outputFile =  $strTaskId . '.txt';
+            $outputFile        = $strTaskId . '.txt';
             $outputFileDetails = $strTaskId . '-details.txt';
 
             // 写入全文本
             file_put_contents($this->downloadDir . $outputFile, $arrTaskInfo['task_result']['result'][0]);
             // 写入文本细节
             $arrDetails = $this->convertDetailContent($arrTaskInfo['task_result']['detailed_result']);
-            $arrLines = array();
-            foreach($arrDetails as $arrLine) {
+            $arrLines   = [];
+            foreach ($arrDetails as $arrLine) {
                 $arrLines[] = implode("\t", $arrLine);
             }
             file_put_contents($this->downloadDir . $outputFileDetails, implode("\n", $arrLines));
 
             // 更新数据库
-            $arrFields = array(
-                'status' => self::STATUS_SUCCUESS,
-                'updateTime' => time(),
+            $arrFields = [
+                'status'      => self::STATUS_SUCCUESS,
+                'updateTime'  => time(),
                 'contentFile' => $outputFile,
                 'detailFile'  => $outputFileDetails,
-            );
+            ];
             $this->tm->updateTaskFieldsByTaskId($arrFields, $strTaskId);
         } else if ($strStatus == 'Failure') {
-            $arrFields = array(
-                'status' => self::STATUS_FAIL,
+            $arrFields = [
+                'status'     => self::STATUS_FAIL,
                 'updateTime' => time(),
-            );
+            ];
             $this->tm->updateTaskFieldsByTaskId($arrFields, $strTaskId);
         }
     }
@@ -206,41 +205,41 @@ class Main extends CI_Controller {
      * @return  mixed
      */
     public function getToken() {
-        $url = 'https://aip.baidubce.com/oauth/2.0/token';
-        $arrPostData['grant_type']       = 'client_credentials';
-        $arrPostData['client_id']      = 'zPC8FwUSsvy6Zbzr01RuFGsQ';
+        $url                          = 'https://aip.baidubce.com/oauth/2.0/token';
+        $arrPostData['grant_type']    = 'client_credentials';
+        $arrPostData['client_id']     = 'zPC8FwUSsvy6Zbzr01RuFGsQ';
         $arrPostData['client_secret'] = 'AVHihdfPTy9PpXZ1DzaOPUvNIqBrsGGA';
-        $strQuery = "";
-        foreach ($arrPostData as $k => $v ) {
-            $strQuery .= "$k=" . urlencode( $v ). "&" ;
+        $strQuery                     = "";
+        foreach ($arrPostData as $k => $v) {
+            $strQuery .= "$k=" . urlencode($v) . "&";
         }
-        $strPost = substr($strQuery,0,-1);
-        $res = $this->request_post($url, $strPost);
-        $arrRet = json_decode($res, true);
+        $strPost = substr($strQuery, 0, -1);
+        $res     = $this->request_post($url, $strPost);
+        $arrRet  = json_decode($res, true);
         return $arrRet['access_token'];
     }
 
     /**
      * @brief   curl请求封装
+     * @param   string    $url
+     * @param   string    $param
+     * @param   array     $arrHeader
      * @author  唐天宇 <tangtianyu@baidu.com>
      * @version 2019-12-16 19:06:06
-     * @param   string $url
-     * @param   string $param
-     * @param   array  $arrHeader
      * @return  bool|string
      */
-    public function request_post($url = '', $param = '', $arrHeader = array()) {
+    public function request_post($url = '', $param = '', $arrHeader = []) {
         if (empty($url) || empty($param)) {
             return false;
         }
 
-        $postUrl = $url;
+        $postUrl  = $url;
         $curlPost = $param;
-        $curl = curl_init();//初始化curl
-        curl_setopt($curl, CURLOPT_URL,$postUrl);//抓取指定网页
-        curl_setopt($curl, CURLOPT_HEADER, 0);//设置header
+        $curl     = curl_init();                      //初始化curl
+        curl_setopt($curl, CURLOPT_URL, $postUrl);    //抓取指定网页
+        curl_setopt($curl, CURLOPT_HEADER, 0);        //设置header
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);//要求结果为字符串且输出到屏幕上
-        curl_setopt($curl, CURLOPT_POST, 1);//post提交方式
+        curl_setopt($curl, CURLOPT_POST, 1);          //post提交方式
         curl_setopt($curl, CURLOPT_POSTFIELDS, $curlPost);
         if (!empty($arrHeader)) {
             curl_setopt($curl, CURLOPT_HTTPHEADER, $arrHeader);
@@ -252,33 +251,32 @@ class Main extends CI_Controller {
     }
 
     public function convertDetailContent($arrData) {
-        $arrRet = array();
-        foreach($arrData as $lineNo => $v) {
+        $arrRet = [];
+        foreach ($arrData as $lineNo => $v) {
             $strStartTime = date("H时i分s秒", intval($v['begin_time'] / 1000));
-            $strEndTime = date("H时i分s秒", intval($v['end_time'] / 1000));
+            $strEndTime   = date("H时i分s秒", intval($v['end_time'] / 1000));
             // $$arrRet[] = array(
             //     'index' => $lineNo + 1,
             //     'startTime' => $strStartTime,
             //     'endTime' => $strEndTime,
             //     'content' => $v['res'][0],
             // );
-            $arrRet[] = array(
+            $arrRet[] = [
                 $lineNo + 1,
                 $strStartTime,
                 $strEndTime,
                 $v['res'][0],
-            );
+            ];
         }
         return $arrRet;
     }
-
 
     public function microtime_format($tag, $time) {
 
         $time = strval($time / 1000);
         list($usec, $sec) = explode(".", $time);
 
-        $date = date($tag,$usec);
+        $date = date($tag, $usec);
 
         return str_replace('x', $sec, $date);
 
